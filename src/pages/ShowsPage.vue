@@ -1,28 +1,28 @@
 <template>
-         <router-link :to="{ name: 'show' }" class="btn text-light lighten-30 selectable text-uppercase">
-           Tv shows
+           <router-link :to="{ name: 'home' }" class="btn text-light lighten-30 selectable text-uppercase">
+          movies
           </router-link>
   <div>
     <div class="px-5">
       <form class="search-form" @submit.prevent="handleSearch">
         <input
           class=""
-          placeholder="Search movies..."
+          placeholder="Search TV shows..."
           type="text"
           id="query"
           name="query"
           v-model="searchQuery"
         />
-        <button class="btn text-light " type="submit">search</button>
+        <button class="btn text-light" type="submit">search</button>
       </form>
     </div>
 
     <div class="movie-list">
-      <template v-if="movies.length > 0">
-        <MovieCard v-for="movie in movies" :key="movie.id" :movie="movie" />
+      <template v-if="shows.length > 0">
+        <ShowCard v-for="show in shows" :key="show.id" :show="show" />
       </template>
       <template v-else>
-        <p>No movies found.</p>
+        <p>No TV shows found.</p>
       </template>
     </div>
 
@@ -35,13 +35,12 @@
 </template>
 
 <script>
-
 import axios from "axios";
-import MovieCard from "../components/MovieCard.vue";
+import ShowCard from "../components/ShowCard.vue";
 const API_KEY = "88d2c735e36149b50c9d46f09826ec06";
 const BASE_URL = "https://api.themoviedb.org/3";
-const POPULAR_MOVIES_ENDPOINT = "/movie/popular";
-const SEARCH_MOVIES_ENDPOINT = "/search/movie";
+const POPULAR_SHOWS_ENDPOINT = "/tv/popular";
+const SEARCH_SHOWS_ENDPOINT = "/search/tv";
 const DEFAULT_PARAMS = {
   api_key: API_KEY,
   language: "en-US",
@@ -50,22 +49,22 @@ const DEFAULT_PARAMS = {
 };
 
 export default {
-  name: "MoviePage",
-  components: { MovieCard },
+  name: "ShowPage",
+  components: { ShowCard },
   data() {
     return {
-      movies: [],
+      shows: [],
       currentPage: DEFAULT_PARAMS.page,
       totalPages: 1,
-      endpoint: `${BASE_URL}${POPULAR_MOVIES_ENDPOINT}`,
+      endpoint: `${BASE_URL}${POPULAR_SHOWS_ENDPOINT}`,
       searchQuery: "",
     };
   },
   methods: {
-    async getMovies(params) {
+    async getShows(params) {
       try {
         const res = await axios.get(this.endpoint, { params });
-        this.movies = res.data.results;
+        this.shows = res.data.results;
         this.currentPage = res.data.page;
         this.totalPages = res.data.total_pages;
       } catch (error) {
@@ -75,22 +74,22 @@ export default {
     handleSearch() {
       const query = this.searchQuery.trim();
       if (query) {
-        this.endpoint = `${BASE_URL}${SEARCH_MOVIES_ENDPOINT}`;
-        this.getMovies({ ...DEFAULT_PARAMS, query });
+        this.endpoint = `${BASE_URL}${SEARCH_SHOWS_ENDPOINT}`;
+        this.getShows({ ...DEFAULT_PARAMS, query });
       } else {
-        this.endpoint = `${BASE_URL}${POPULAR_MOVIES_ENDPOINT}`;
-        this.getMovies(DEFAULT_PARAMS);
+        this.endpoint = `${BASE_URL}${POPULAR_SHOWS_ENDPOINT}`;
+        this.getShows(DEFAULT_PARAMS);
       }
     },
     handlePreviousPage() {
       if (this.currentPage > 1) {
-        this.getMovies({ ...DEFAULT_PARAMS, page: this.currentPage - 1 });
+        this.getShows({ ...DEFAULT_PARAMS, page: this.currentPage - 1 });
         this.scrollToTop();
       }
     },
     handleNextPage() {
       if (this.currentPage < this.totalPages) {
-        this.getMovies({ ...DEFAULT_PARAMS, page: this.currentPage + 1 });
+        this.getShows({ ...DEFAULT_PARAMS, page: this.currentPage + 1 });
         this.scrollToTop();
       }
     },
@@ -104,19 +103,11 @@ export default {
     },
   },
   mounted() {
-    this.getMovies(DEFAULT_PARAMS);
+    this.getShows(DEFAULT_PARAMS);
   },
 };
 </script>
-
-
 <style>
-.text-light{
-  color: white;
-}
-body{
-  background-color: black;
-}
 .btn-color{
   background-color: #FF0000;
 }
@@ -146,7 +137,7 @@ body{
     color: white;
   }
   .pagination button:disabled {
-    background-color: rgb(0, 0, 0);
+    background-color: gray;
     color: white;
     cursor: not-allowed;
   }
